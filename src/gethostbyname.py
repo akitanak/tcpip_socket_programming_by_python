@@ -4,8 +4,8 @@ while True:
     try:
         hostname = input("enter hostname.(q: exit)")
         if hostname == "q":
-           break
+            break
         print(socket.gethostbyname(hostname))
-    except:
-        print("cannot translate.")
 
+    except Exception:
+        print("cannot translate.")
