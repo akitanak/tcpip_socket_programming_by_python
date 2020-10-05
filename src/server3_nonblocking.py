@@ -28,6 +28,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         inputs = [sock]
         outputs = []
         msgs = {}
+        clientno_dict = {}
         clientno = 0
         while inputs:
             readable, writable, exceptional = select.select(inputs, outputs, inputs)
@@ -39,17 +40,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                     clientno += 1
                     msg = str(datetime.datetime.now())
                     msgs[client] = msg
+                    clientno_dict[client] = clientno
                     print(f"{msg} receive connection request.(client no: {clientno})")
                     print(client)
                 else:
                     data = s.recv(BUF_SIZE)
                     if data:
-                        print(f"({clientno}) {data.decode('UTF-8')}")
+                        c_no = clientno_dict.get(s)
+                        print(f"({c_no}) {data.decode('UTF-8')}")
                         msg = msgs.get(s)
                         if msg is not None:
-                            client.sendall(msg.encode("UTF-8"))
+                            s.sendall(msg.encode("UTF-8"))
                         else:
-                            client.sendall("NOT FOUND.".encode("UTF-8"))
+                            s.sendall("NOT FOUND.".encode("UTF-8"))
                     else:
                         inputs.remove(s)
                         msgs.pop(s)
