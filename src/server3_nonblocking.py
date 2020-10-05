@@ -5,18 +5,6 @@ import datetime
 PORT = 50000
 BUF_SIZE = 4096
 
-
-def client_handler(client, clientno, msg):
-    try:
-        data = client.recv(BUF_SIZE)
-        print(f"({clientno}) {data.decode('UTF-8')}")
-        client.sendall(msg.encode("UTF-8"))
-    except Exception as e:
-        print(f"unexpected errror.{e}")
-    finally:
-        client.close()
-
-
 client = None
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
     try:
@@ -34,7 +22,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             readable, writable, exceptional = select.select(inputs, outputs, inputs)
 
             for s in readable:
-                if s is sock:
+                if s.fileno() == sock.fileno():
                     client, addr = s.accept()
                     inputs.append(client)
                     clientno += 1
