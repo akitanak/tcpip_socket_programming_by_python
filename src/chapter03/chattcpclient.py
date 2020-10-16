@@ -18,23 +18,23 @@ def server_handler(client):
         client.close()
 
 
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
-    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     host = input("接続サーバ: ")
     if host == "":
         host = "localhost"
 
-    p = threading.Thread(target=server_handler, args=(client,))
-    p.setDaemon(True)
+    client.connect((host, PORT))
+    receive_thread = threading.Thread(target=server_handler, args=(client,))
+    receive_thread.start()
 
     while True:
         msg = input("")
-        client.sendto(msg.encode("utf-8"), (host, PORT))
         if msg == "q":
             break
+        client.sendall(msg.encode("utf-8"))
 
-        if not p.is_alive():
-            p.start()
-
+except Exception as e:
+    print(e)
 finally:
     client.close()
