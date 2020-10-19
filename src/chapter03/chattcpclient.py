@@ -7,15 +7,15 @@ BUFF_SIZE = 4096
 
 
 def server_handler(client):
-    try:
-        while True:
+    while True:
+        try:
             data = client.recv(BUFF_SIZE)
             print(data.decode("utf-8"))
-    except Exception as e:
-        print(e)
-
-    finally:
-        client.close()
+        except Exception as e:
+            if client.fileno() == -1:
+                break
+            else:
+                print(e)
 
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -30,11 +30,12 @@ try:
 
     while True:
         msg = input("")
+        client.sendall(msg.encode("utf-8"))
         if msg == "q":
             break
-        client.sendall(msg.encode("utf-8"))
 
 except Exception as e:
     print(e)
+
 finally:
     client.close()

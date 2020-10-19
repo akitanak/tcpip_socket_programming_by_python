@@ -30,7 +30,8 @@ def msg_sender(clients, queue):
 
             for client in clients:
                 try:
-                    client.sendall(msg.encode("utf-8"))
+                    if client.fileno() != -1:
+                        client.sendall(msg.encode("utf-8"))
                 except Exception as e:
                     print(f"send msg was failed. {e}")
                     clients.remove(client)
@@ -47,6 +48,7 @@ clients = []
 msg_queue = Queue()
 sender_thread = threading.Thread(target=msg_sender, args=(clients, msg_queue))
 sender_thread.start()
+print("Server was started. waiting for client messages...")
 
 while True:
     client, addr = server.accept()
